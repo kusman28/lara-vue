@@ -14,3 +14,9 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/sanaol', 'SanaolController@sanaol');
+
+Route::any('{slug}', function () {
+    return view('welcome');
+});
