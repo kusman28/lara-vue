@@ -20,3 +20,6 @@ Route::get('/sanaol', 'SanaolController@sanaol');
 Route::any('{slug}', function () {
     return view('welcome');
 });
+
+Route::post('app/created_tag', 'AdminController@addTag');
+Route::get('app/created_tag', 'AdminController@getTag');

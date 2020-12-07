@@ -12,4 +12,10 @@ class SanaolController extends Controller
             'message' => 'ASD'
         ]);
     }
+
+    public function wew() {
+        return response()->json([
+            'msg' => 'NyeK!'
+        ], 422);
+    }
 }
