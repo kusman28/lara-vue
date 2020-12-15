@@ -40,7 +40,7 @@ export default {
                 desc: desc
             });
         },
-        swr (desc="Something went wrong. Please try again.", title="Fail!") {
+        swr (desc="Something went wrong. Please try again.", title="Fail") {
             this.$Notice.error({
                 title: title,
                 desc: desc

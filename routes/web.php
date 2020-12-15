@@ -21,5 +21,14 @@ Route::any('{slug}', function () {
     return view('welcome');
 });
 
-Route::post('app/created_tag', 'AdminController@addTag');
+
+// Tag Controller
 Route::get('app/created_tag', 'AdminController@getTag');
+Route::post('app/created_tag', 'AdminController@addTag');
+Route::post('app/edit_tag', 'AdminController@editTag');
+Route::post('app/delete_tag', 'AdminController@deleteTag');
+Route::post('app/upload', 'AdminController@upload');
+Route::post('app/delete_image', 'AdminController@deleteImage');
+
+Route::post('app/create_category', 'AdminController@addCategory');
+Route::get('app/created_category', 'AdminController@getCategory');
