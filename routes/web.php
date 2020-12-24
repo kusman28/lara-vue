@@ -32,4 +32,5 @@ Route::post('app/delete_image', 'AdminController@deleteImage');
 
 // Category Routes
 Route::post('app/create_category', 'AdminController@addCategory');
+Route::post('app/edit_category', 'AdminController@editCategory');
 Route::get('app/created_category', 'AdminController@getCategory');

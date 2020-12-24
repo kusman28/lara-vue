@@ -35,7 +35,7 @@
 					</div>
 				</div>
 
-				<!-- Add Tag -->
+				<!-- Add Category -->
 				<Modal
 					v-model="addModal"
 					title="Add Category"
@@ -64,7 +64,7 @@
                     </Upload>
 
                     <div class="demo-upload-list" v-if="data.iconImage">
-                            <img :src="`/uploads/${data.iconImage}`">
+                            <img :src="`${data.iconImage}`">
                             <div class="demo-upload-list-cover">
                                 <Icon type="ios-trash-outline" @click="deleteImage"></Icon>
                             </div>
@@ -79,18 +79,44 @@
 					</div>
 				</Modal>
 
-				<!-- Edit Tag -->
+				<!-- Edit Category -->
 				<Modal
 					v-model="editModal"
-					title="Edit Tag"
+					title="Edit Category"
 					width="400"
 					:mask-closable="false"
 					:closable="false">
-					<Input v-model="editData.tagName" placeholder="Enter Tag name"/>
+					
+					<Input v-model="editData.categoryName" placeholder="Enter Category name"/>
+
+                    <div class="space"></div>
+                    <Upload v-show="isIconImageNew"
+                        ref="editDataUploads"
+                        type="drag"
+                        :headers="{'x-csrf-token' : token, 'X-Requested-With' : 'XMLHttpRequest'}"
+                        :on-success="handleSuccess"
+                        :format="['jpg','jpeg','png']"
+                        :on-format-error="handleFormatError"
+                        :on-error="handleError"
+                        :max-size="2048"
+                        :on-exceeded-size="handleMaxSize"
+                        action="/app/upload">
+                        <div style="padding: 20px 0">
+                            <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+                            <p>Click or drag files here to upload</p>
+                        </div>
+                    </Upload>
+
+                    <div class="demo-upload-list" v-if="editData.iconImage">
+                            <img :src="`${editData.iconImage}`">
+                            <div class="demo-upload-list-cover">
+                                <Icon type="ios-trash-outline" @click="deleteImage(false)"></Icon>
+                            </div>
+                    </div>
 
 					<div slot="footer">
-						<Button type="default" @click="editModal = false">Close</Button>
-						<Button type="primary" @click="editTag" :disabled="isAdding" :loading="isAdding">{{ isAdding ? 'Editing...' : 'Save'}}</Button>
+						<Button type="default" @click="closeEdit = false">Close</Button>
+						<Button type="primary" @click="editCategory" :disabled="isAdding" :loading="isAdding">{{ isAdding ? 'Editing...' : 'Edit Category'}}</Button>
 					</div>
 				</Modal>
 
@@ -122,7 +148,8 @@ export default {
                 iconImage: ''
 			},
 			editData: {
-				tagName: ''
+				categoryName: '',
+                iconImage: ''
 			},
 			addModal: false,
 			editModal: false,
@@ -135,7 +162,9 @@ export default {
 			isDeleting: false,
 			deleteItem: {},
             i: -1,
-            token: ''
+			token: '',
+			isIconImageNew: false,
+			isEditingItem: false
 		}
 	},
 	methods: {
@@ -163,31 +192,36 @@ export default {
 				}
 			}
 		},
-		async editTag() {
-			if(this.editData.tagName.trim()=='') return this.error('Tag name is required.')
-			const res = await this.callApi('post', 'app/edit_tag', this.editData)
+		async editCategory() {
+			if(this.editData.categoryName.trim()=='') return this.error('Category name is required.')
+			if(this.editData.iconImage.trim()=='') return this.error('Icon image is required.')
+			const res = await this.callApi('post', 'app/edit_category', this.editData)
 			if (res.status===200) {
-				this.tags[this.index].tagName = this.editData.tagName
-				this.success('Tag has been saved.')
+				this.categoryLists[this.index].categoryName = this.editData.categoryName
+				this.success('Category has been saved.')
 				this.editModal = false
 			} else {
 				if (res.status == 422) {
-					if (res.editData.errors.tagName) {
-						this.error(res.editData.errors.tagName[0])
+					if (res.data.errors.categoryName) {
+						this.error(res.data.errors.categoryName[0])
+					}
+					if (res.data.errors.iconImage) {
+						this.error(res.data.errors.iconImage[0])
 					}
 				} else {
 					this.swr()
 				}
 			}
 		},
-		showEdit(tag, index) {
-			let obj = {
-				id: tag.id,
-				tagName: tag.tagName
-			}
-			this.editData = obj
+		showEdit(category, index) {
+			// let obj = {
+			// 	id: tag.id,
+			// 	tagName: tag.tagName
+			// }
+			this.editData = category
 			this.editModal = true
 			this.index = index
+			this.isEditingItem = true
 		},
 		async deleteTag() {
 			this.isDeleting = true
@@ -207,6 +241,11 @@ export default {
 			this.deleteModal = true
         },
         handleSuccess (res, file) {
+			res = `/uploads/${res}`
+			if(this.isEditingItem)
+			{
+				return this.editData.iconImage = res
+			}
             this.data.iconImage = res
         },
         handleError (res, file) {
@@ -229,16 +268,28 @@ export default {
                 desc: 'File  ' + file.name + ' is too large, no more than 2M.'
             });
         },
-        async deleteImage() {
-            let image = this.data.iconImage
-            this.data.iconImage = ''
-            this.$refs.uploads.clearFiles()
+        async deleteImage(isAdd=true) {
+			let image
+			if(!isAdd){
+				this.isIconImageNew = true
+				image = this.editData.iconImage
+				this.editData.iconImage = ''
+				this.$refs.editDataUploads.clearFiles()
+			}else{
+				image = this.data.iconImage
+				this.data.iconImage = ''
+				this.$refs.uploads.clearFiles()
+			}
             const res = await this.callApi('post', 'app/delete_image', {imageName: image})
             if (res.status !== 200) {
                 this.data.iconImage = image
                 this.swr()
             }
-        }
+		},
+		closeEdit() {
+			this.isEditingItem = false
+			this.editModal = false
+		}
 	},
     async created() {
         this.token = window.Laravel.csrfToken
