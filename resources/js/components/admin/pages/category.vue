@@ -116,7 +116,7 @@
 
 					<div slot="footer">
 						<Button type="default" @click="closeEdit = false">Close</Button>
-						<Button type="primary" @click="editCategory" :disabled="isAdding" :loading="isAdding">{{ isAdding ? 'Editing...' : 'Edit Category'}}</Button>
+						<Button type="primary" @click="editCategory" :disabled="isAdding" :loading="isAdding">{{ isAdding ? 'Editing...' : 'Save Category'}}</Button>
 					</div>
 				</Modal>
 

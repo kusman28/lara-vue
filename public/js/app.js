@@ -68192,7 +68192,7 @@ var render = function() {
                     },
                     [
                       _vm._v(
-                        _vm._s(_vm.isAdding ? "Editing..." : "Edit Category")
+                        _vm._s(_vm.isAdding ? "Editing..." : "Save Category")
                       )
                     ]
                   )
@@ -68707,6 +68707,22 @@ var render = function() {
                       [
                         _c("Icon", { attrs: { type: "ios-speedometer" } }),
                         _vm._v(" Category")
+                      ],
+                      1
+                    )
+                  ],
+                  1
+                ),
+                _vm._v(" "),
+                _c(
+                  "li",
+                  [
+                    _c(
+                      "router-link",
+                      { attrs: { to: "/category" } },
+                      [
+                        _c("Icon", { attrs: { type: "ios-speedometer" } }),
+                        _vm._v(" Members")
                       ],
                       1
                     )
